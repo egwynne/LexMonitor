@@ -1,0 +1,356 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+Crear | LeyTracker
+{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" />
+<style>
+  td {
+    font-size: 0.9em;
+  }
+</style>
+{% endblock css %}
+
+{% block content %}
+
+<div id="app">
+  <div class="page-breadcrumb breadcrumb-font  d-md-flex align-items-center mb-3">
+    <h3 class="content-header-title float-left mb-0" style="margin-right: 15px;">Crear Regulacion</h3>
+    <div class="ps-3">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 p-0">
+          <li class="breadcrumb-item"><a href="javascript:;"><i class="tf-icons ti ti-home"></i></a>
+          </li>
+          <li class="breadcrumb-item active mt-1" aria-current="page">Regulaciones</li>
+
+          <li class="breadcrumb-item active mt-1" aria-current="page">Crear</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 order-1 order-lg-2 mb-4 mb-lg-0">
+      <div class="card">
+        <div class="card-header">
+          <div class="row d-flex align-items-center">
+            <div class="col-12 col-lg-9 d-flex align-items-center">
+              <h3>Ingrese la informacion solicitada</h3>
+            </div>
+            <!--<div class="col-2 btn-end">
+              <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasBackdrop" aria-controls="offcanvasBackdrop"
+                class="btn btn-primary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#pricingModal">
+                Agregar Usuario
+              </button>
+            </div>-->
+            <div class="col-12 col-lg-3 btn-end">
+              <label class="control-label">Fecha Creación:</label>
+              <input type="date" class="form-control" v-model="nueva_regulacion.fecha_creacion">
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="col-12 mb-0 d-flex align-items-center">
+            <h5>
+              <span class="badge bg-info me-1" style="font-size: 14px;" v-text="'1'"></span>
+              Cabeceras:
+            </h5>
+          </div>
+          <div class="row">
+            <div class="col-4 col-lg-3  mt-1">
+              <label class="control-label">Correlativo:</label>
+              <div class="input-group input-group-merge">
+                <span class="input-group-text"><i class="ti ti-hash"></i></span>
+                <input class="form-control" v-model="nueva_regulacion.correlativo" disabled>
+              </div>
+            </div>
+
+            
+            <div class="col-8 col-lg-9  mt-1">
+              <label class="control-label">Politica Publica :</label>
+              <input class="form-control" v-model="nueva_regulacion.nombre" >
+            </div>
+
+            <div class="col-12 col-lg-12  mt-3">
+              <label class="control-label">Estado Tramite :</label>
+              <input class="form-control" v-model="nueva_regulacion.estado_tramite" >
+            </div>
+            
+            
+
+            
+          </div>
+          <div class="row">
+            <div class="col-6 col-lg-3 mt-3">
+              <label class="control-label">Impacto :</label>
+              <select class="form-select" id="dropdownFactibilidad" v-model="nueva_regulacion.impacto">
+                <option value="-1"  disabled>Seleccione</option>
+                <option value="0"  >IMPLEMENTACION</option>
+                <option value="1"  >BAJO</option>
+                <option value="2"  >MEDIO</option>
+                <option value="3"  >ALTO</option>
+              </select>
+            </div>
+
+            <div class="col-6 col-lg-3  mt-3 ">
+              <label class="control-label">Factibilidad:</label>
+              <select class="form-select" id="dropdownFactibilidad" v-model="nueva_regulacion.factibilidad">
+                <option value="-1"  disabled>Seleccione</option>
+                <option value="0"  >IMPLEMENTACION</option>
+                <option value="1"  >BAJO</option>
+                <option value="2"  >MEDIO</option>
+                <option value="3"  >ALTO</option>
+              </select>
+            </div>
+
+            <div class="col-6 col-lg-3 mt-3 mb-1">
+              <label class="control-label">Servicio :</label>
+              <select class="form-select" id="dropdownFactibilidad" v-model="nueva_regulacion.servicio">
+                <option value="-1"  disabled>Seleccione</option>
+                <option value="0"  >S</option>
+                <option value="1"  >M</option>
+                <option value="2"  >L</option>
+              </select>
+
+            </div>
+
+            <div class="col-6 col-lg-3 mt-3">
+              <label class="control-label">Priorización :</label>
+              <select class="form-select" id="dropdownFactibilidad" v-model="nueva_regulacion.priorizacion">
+                <option value="-1"  disabled>Seleccione</option>
+                <option value="0"  >POR DEFINIR</option>
+                <option value="1"  >INCIDENCIA</option>
+                <option value="2"  >INFORMAR</option>
+              </select>
+            </div>
+            
+          </div>
+
+          <div class="row">
+            
+            <div class="col-6 col-lg-3 mt-3 mb-1">
+              <label class="control-label">Impacto Publico:</label>
+              <select class="form-select" id="dropdownFactibilidad" v-model="nueva_regulacion.impacto_deb">
+                <option value="-1"  disabled>Seleccione</option>
+                <option value="4"  >SIN DEFINIR</option>
+                <option value="1"  >BAJO</option>
+                <option value="2"  >MEDIO</option>
+                <option value="3"  >ALTO</option>
+              </select>
+            </div>
+            
+            <div class="col-6 col-lg-3  mt-3">
+              <label class="control-label">ESG :</label>
+              <select class="form-select" id="dropdownFactibilidad" v-model="nueva_regulacion.esg">
+                <option value="-1"  disabled>Seleccione</option>
+                <option value="0"  >IMPLEMENTACION</option>
+                <option value="1"  >E</option>
+                <option value="2"  >S</option>
+                <option value="3"  >G</option>
+                <option value="3"  >N/A</option>
+              </select>
+            </div>
+
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-12 mb-0 mt-1 d-flex align-items-center">
+              <h5>
+                <span class="badge bg-info me-1 " style="font-size: 14px;" v-text="'2'"></span>
+                Información:
+              </h5>
+            </div>
+            <div class="col-12 col-lg-6">
+              <label class="control-label">Tipo Actividad:</label>
+              <input class="form-control" v-model="nueva_regulacion.tipo_acti" >
+            </div>
+            <div class="col-12 col-lg-6">
+              <label class="control-label">Origen:</label>
+              <input class="form-control" v-model="nueva_regulacion.origen" >
+            </div>
+            
+          </div>
+
+          <div class="row">
+            <div class="col-12 col-lg-6 mt-3">
+              <label class="control-label">Responsabilidad Gerencial:</label>
+              <input class="form-control" v-model="nueva_regulacion.responsabilidad_geren" >
+            </div>
+            
+            <div class="col-12 col-lg-6 mt-3">
+              <label class="control-label">Responsable:</label>
+              <input class="form-control" v-model="nueva_regulacion.prof_respon" >
+            </div>
+            
+          </div>
+
+          <div class="row">
+            <div class="col-12 col-lg-6 mt-3 mb-3">
+              <label class="control-label">Ámbito Afectado:</label>
+              <input class="form-control" v-model="nueva_regulacion.ambito_afectado" >
+            </div>
+            
+            <div class="col-12 col-lg-6 mt-3 mb-3">
+              <label class="control-label">Foco/Tema:</label>
+              <input class="form-control" v-model="nueva_regulacion.foco" >
+            </div>
+            
+            
+          </div>
+          <hr>
+          <div class="col-12 d-flex align-items-center">
+            <h5>
+              <span class="badge bg-info me-1 mb-1" style="font-size: 14px;" v-text="'3'"></span>
+              Comentario:
+            </h5>
+          </div>
+          <div class="row">
+            <div class="col-12 col-lg-6">
+              <label class="control-label">Referencia:</label>
+              <input class="form-control" v-model="nueva_regulacion.referencia">
+            </div>
+            <div class="col-12 col-lg-6">
+              <label class="control-label">Autor:</label>
+              <input class="form-control" v-model="nueva_regulacion.autor_text" disabled>
+            </div>
+            <div class="col-12 col-lg-12 mt-3">
+              <label class="control-label">Comentario:</label>
+              <textarea rows="5" class="form-control" v-model="nueva_regulacion.comentario" ></textarea>
+            </div>
+          </div>
+
+
+        </div>
+
+
+
+
+      </div>
+      <div class="col-12 col-lg-4 mt-3">
+        <button  class="btn btn-primary" @click="CreateRegulation">Crear Regulacion</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBackdrop" aria-labelledby="offcanvasBackdropLabel">
+    <div class="offcanvas-header">
+      <h4 id="offcanvasBackdropLabel" class="offcanvas-title" style="padding-left: 4.5em;">Nuevo Usuario</h4>
+      <button id="close_modal" type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+        aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body mx-0 pt-0 flex-grow-0">
+      <div class="row">
+        <div class="col-12">
+          <h5 class="mb-0">Datos Personales</h5> <small class="text-muted float-end"></small>
+        </div>
+        <div class="col-12 mt-3">
+          <label class="control-label">Nombres:</label>
+          <input  type="text" class="form-control">
+        </div>
+        
+        <div class="col-12 mt-3">
+          <label class="control-label">Tipo Usuario:</label>
+          <select class="form-select" id="dropdownContrato">
+            <option value="-1" selected disabled>Seleccione</option>
+          </select>
+        </div>
+        <div class="col-12 mt-5">
+          <button  class="btn btn-primary w-100">Crear Usuario</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+<script>
+  $(document).ready(function () {
+    $("#create-regulacion-sidebar").addClass("active")
+  })
+</script>
+
+
+<script>
+  new Vue({
+    el: "#app",
+    delimiters: ['[[', ']]'],
+    data: {
+      nueva_regulacion:{
+        id:"",
+        correlativo:"",
+        nombre:"",
+        factibilidad:"-1",
+        impacto:"-1",
+        priorizacion:"-1",
+        servicio:"-1",
+
+        tipo_acti:"",
+        responsabilidad_geren:"",
+        prof_respon:"",
+        impacto_deb:"-1",
+        origen:"",
+        ambito_afectado:"",
+        foco:"",
+        estado:"",
+        esg:"-1",
+        fecha_creacion:"",
+        comentario:"",
+        referencia:"",
+        autor_text:"{{request.user.first_name}} {{request.user.last_name}}",
+        autor_id:"{{request.user.pk}}",
+        estado_tramite:""
+
+      }
+      
+    },
+    mounted() {
+      const fechaHoy = new Date();
+      const year = fechaHoy.getFullYear();
+      const month = (fechaHoy.getMonth() + 1).toString().padStart(2, '0'); // Los meses empiezan desde 0
+      const day = fechaHoy.getDate().toString().padStart(2, '0');
+      const fechaFormateada = `${year}-${month}-${day}`;
+
+      this.nueva_regulacion.fecha_creacion = fechaFormateada;
+      this.fetchData()
+    },
+    created() {
+    },
+    methods: {
+      fetchData() {
+        axios.get("/api/get/correlativo/").then((response) => {
+                    this.nueva_regulacion.correlativo = response.data.correlativo
+                })
+      },
+      CreateRegulation(){
+        let body = {
+          regulacion : this.nueva_regulacion
+        }
+        axios.post("/api/create/regulacion/",body).then((response) => {
+          Swal.fire({
+                        title: "Éxito!",
+                        text: "Se creo con exito la Regulación!",
+                        icon: "success",
+                        confirmButtonText: 'Ver Lista',
+
+                    }).then(function (isconfirm) {
+                      if(isconfirm.isConfirmed){
+                        window.location.href = "/lista_regulaciones/"
+                      }
+                    
+                })
+
+        })
+      }
+      
+
+    }
+
+  })
+</script>
+{% endblock js %}

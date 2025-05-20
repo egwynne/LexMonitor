@@ -1,0 +1,50 @@
+{% load static %}
+
+<ul class="menu-inner py-1">
+  <li class="menu-item" id="index-sidebar">
+    <a href="{% url 'index' %}" class="menu-link">
+      <i class="menu-icon tf-icons ti  ti-home"></i>
+      <div data-i18n="Inicio">Inicio</div>
+    </a>
+  </li>
+  {% if request.user.profile.tipo_usuario in "0" %}
+  <li class="menu-header small text-uppercase">
+    <span class="menu-header-text">Administrador</span>
+  </li>
+  <li class="menu-item" id="usuarios-sidebar">
+    <a href="{% url 'usuarios' %}" class="menu-link">
+      <i class="menu-icon tf-icons ti  ti-users"></i>
+      <div data-i18n="Usuarios">Usuarios</div>
+    </a>
+  </li>
+  {% endif %}
+
+  <li class="menu-header small text-uppercase">
+    <span class="menu-header-text">Regulaciones</span>
+  </li>
+  {% if request.user.profile.tipo_usuario in "0,1" %}
+
+  <li class="menu-item" id="create-regulacion-sidebar">
+    <a href="{% url 'create_regulacion' %}" class="menu-link">
+      <i class="menu-icon tf-icons ti  ti-file-plus"></i>
+      <div data-i18n="Crear Regulacion">Crear Regulacion</div>
+    </a>
+  </li>
+  {% endif %}
+
+  <li class="menu-item" id="lista-regulacion-sidebar">
+    <a href="{% url 'lista_regulaciones' %}" class="menu-link">
+      <i class="menu-icon tf-icons ti  ti-files"></i>
+      <div data-i18n="Lista Regulaciones">Lista Regulaciones</div>
+    </a>
+  </li>
+  <li class="menu-item" id="estadisticas-regulacion-sidebar">
+    <a href="{% url 'estadisticas' %}" class="menu-link">
+      <i class="menu-icon tf-icons ti  ti-chart-area"></i>
+      <div data-i18n="Estadisticas ">Estadisticas</div>
+    </a>
+  </li>
+
+
+
+</ul>

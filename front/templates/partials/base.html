@@ -1,0 +1,434 @@
+{% load static %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+
+<html lang="en" class="light-style layout-navbar-fixed layout-menu-fixed" dir="ltr" data-theme="theme-default-dark"
+  data-assets-path="{% static '/' %}" data-template="vertical-menu-template">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+  <title>{% block title %}{% endblock title %}</title>
+
+  <meta name="description" content="" />
+
+  <!-- Favicon ICONO
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon/favicon.ico' %}" />
+  -->
+  <link rel="icon" type="image/x-icon" href="{% static 'img/icons/LT_icon.png' %}" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="{% static 'vendor/fonts/fontawesome.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendor/fonts/tabler-icons.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendor/fonts/flag-icons.css' %}" />
+
+  <!-- Core CSS -->
+  <link rel="stylesheet" href="{% static 'vendor/css/rtl/core-dark.css' %}" class="template-customizer-core-css" />
+  <link rel="stylesheet" href="{% static 'vendor/css/rtl/theme-default-dark.css' %}"
+    class="template-customizer-theme-css" />
+  <link rel="stylesheet" href="{% static 'css/demo.css' %}" />
+
+  <!-- Vendors CSS -->
+  <link rel="stylesheet" href="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendor/libs/node-waves/node-waves.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendor/libs/typeahead-js/typeahead.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendor/libs/swiper/swiper.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
+
+  <link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+
+
+
+  {% comment %}
+  <link rel="stylesheet" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" /> {% endcomment %}
+
+  <!-- Page CSS -->
+  <link rel="stylesheet" href="{% static 'vendor/css/pages/cards-advance.css' %}" />
+  <!-- Helpers -->
+  <script src="{% static 'vendor/js/helpers.js' %}"></script>
+  <script src="{% static 'vendor/libs/flatpickr/flatpickr.js' %}"></script>
+
+
+  {% comment %}
+  <script src="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}"></script>{% endcomment %}
+
+  <!--FONTS-->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700">
+
+  <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+  <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+  <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+  <script src="{% static 'js/config.js' %}"></script>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+
+  {% block css %}
+
+  {% endblock %}
+  <style>
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Layout wrapper -->
+  <div class="layout-wrapper layout-content-navbar">
+    <div class="layout-container">
+      <!-- Menu -->
+
+      <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+        <div class="app-brand m-2 text-center demo">
+
+          <a href="{% url 'index' %}" class="app-brand-link justify-content-center">
+            <img class="img img-fluid w-75 text-center" src="{% static 'img/icons/LEY_TRACKER.png' %}" alt="">
+          </a>
+
+        </div>
+
+        <div class="menu-inner-shadow"></div>
+
+        {% include 'partials/sidebar.html' %}
+        <!--
+        <button id="sidebar-toggle-btn" class="btn btn-primary btn-sidebar-toggle"  onclick="toggleSidebar()">Toggle Sidebar</button>-->
+      </aside>
+      <!-- / Menu -->
+
+      <!-- Layout container -->
+      <div class="layout-page">
+        <!-- Navbar -->
+
+        <nav
+          class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+          id="layout-navbar">
+          <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+            <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+              <i class="ti ti-menu-2 ti-sm"></i>
+            </a>
+          </div>
+
+          <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+            <!-- Search -->
+            <div class="navbar-nav align-items-center">
+              <div class="nav-item navbar-search-wrapper mb-0">
+                <a class="nav-item nav-link search-toggler d-flex align-items-center px-0" href="javascript:void(0);">
+                  <template v-if="status_sync == 'Sincronizando'">
+                    <div class="spinner-border mr-2 text-secondary" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span class="badge bg-warning">Sincronizando información con SII - <strong> Última act.
+                        [[update_at]]</strong></span>
+                  </template>
+                  <template v-if="status_sync == 'Sincronizado'">
+                    <i v-on:click="sync_sii()" class="ti ti-refresh ti-md me-2"></i>
+                    <span class="badge bg-success">Información sincronizada con el SII - <strong> Última act.
+                        [[update_at]]</strong></span>
+                  </template>
+                  <template v-if="status_sync == 'Error'">
+                    <i v-on:click="sync_sii()" class="ti ti-refresh ti-md me-2"></i>
+                    <span class="badge bg-danger">Error en la ultima actualización con el SII - <strong> Última act.
+                        [[update_at]]</strong></span>
+                  </template>
+                </a>
+              </div>
+            </div>
+            <!-- /Search -->
+
+            <ul class="navbar-nav flex-row align-items-center ms-auto">
+
+              <!-- User -->
+              <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                  <div class="d-flex align-items-center">
+                    <div class="user-nav d-sm-flex d-none m-1">
+                      <span class="user-name text-bold-600"></span>
+                      <span class="user-status">{{request.user.username}}</span>
+                    </div>
+                    <div class="avatar avatar-online ms-2">
+                      <img src="{% static 'img/avatars/1.png' %}" alt class="h-auto rounded-circle" />
+                    </div>
+                  </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a class="dropdown-item" href="pages-account-settings-account.html">
+                      <div class="d-flex">
+                        <div class="flex-shrink-0 me-3">
+                          <div class="avatar avatar-online">
+                            <img src="{% static 'img/avatars/1.png' %}" alt class="h-auto rounded-circle" />
+                          </div>
+                        </div>
+                        <div class="flex-grow-1">
+                          <span class="fw-semibold d-block">{{request.user.first_name}}
+                            {{request.user.last_name}}</span>
+                          <small class="text-muted">{{request.user.profile.tipo_usuario | usuario}}</small>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                  <li>
+                    <div class="dropdown-divider"></div>
+                  </li>
+                  {% if request.user.profile.tipo_usuario == "Cliente" %}
+                  <li>
+                    <a class="dropdown-item" href="{% url 'perfil_cliente' %}">
+                      <i class="ti ti-user-check me-2 ti-sm"></i>
+                      <span class="align-middle">Perfil</span>
+                    </a>
+                  </li>
+                  {% endif %}
+                  <li>
+                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#pagarIVA" id="cambiar_pass_button">
+                      <i class="ti ti-settings me-2 ti-sm"></i>
+                      <span class="align-middle">Cambiar Contraseña</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'login' %}">
+                      <i class="ti ti-logout me-2 ti-sm"></i>
+                      <span class="align-middle">Cerrar Sesión</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <!--/ User -->
+            </ul>
+          </div>
+
+          <!-- Search Small Screens -->
+          <div class="navbar-search-wrapper search-input-wrapper d-none">
+            <input type="text" class="form-control search-input container-xxl border-0" placeholder="Search..."
+              aria-label="Search..." />
+            <i class="ti ti-x ti-sm search-toggler cursor-pointer"></i>
+          </div>
+        </nav>
+
+        <!-- / Navbar -->
+
+        <!-- Content wrapper -->
+        <div class="content-wrapper">
+          <!-- Content -->
+
+          <div class="container-xxl flex-grow-1 container-p-y">
+            {% block content %}
+            {% endblock content %}
+
+
+
+
+
+
+          </div>
+          <!-- / Content -->
+
+
+
+          <div class="content-backdrop fade"></div>
+        </div>
+        <!-- Content wrapper -->
+        <!-- Footer -->
+        <footer class="content-footer footer bg-footer-theme">
+          <div class="container-xxl">
+            <div
+              class="footer-container d-flex align-items-center justify-content-between py-2 flex-md-row flex-column">
+
+            </div>
+          </div>
+        </footer>
+        <!-- / Footer -->
+      </div>
+      <!-- / Layout page -->
+    </div>
+
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+
+
+    <div id="modals-vue">
+
+
+
+    <div class="modal fade" id="pagarIVA">
+      <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Cambiar Contraseña</h5>
+
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body  custom-scrollbar" style="max-height: 60vh;overflow-y: auto;">
+            <div class="row">
+              <div class="col-md-12">
+                <!--asistencia-->
+                <div class="row mt-2 d-flex align-items-center justify-content-center">
+
+                  <form id="formAuthentication"  class="mb-3" >
+                    <div class="mb-3 form-password-toggle">
+                      <div class="d-flex justify-content-between">
+                        <label class="form-label" for="password">Nueva Contraseña</label>
+                      </div>
+                      <div class="input-group input-group-merge">
+                        <input type="password" id="password" class="form-control" name="password"
+                          aria-describedby="password" v-model="nueva_pass.nueva_pass" />
+                        <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 form-password-toggle">
+                      <div class="d-flex justify-content-between">
+                        <label class="form-label" for="password">Confirmar Contraseña</label>
+                      </div>
+                      <div class="input-group input-group-merge">
+                        <input type="password" id="confirm-password" class="form-control" name="confirm-password"
+                          aria-describedby="confirm-password" v-model="nueva_pass.repetir_pass"/>
+                        <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary" :disabled="nueva_pass.nueva_pass != nueva_pass.repetir_pass" @click="cambiarPass">Cambiar Contraseña</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  </div>
+  <!-- / Layout wrapper -->
+
+  <!-- Core JS -->
+  <!-- build:js assets/vendor/js/core.js -->
+  <script src="{% static 'vendor/libs/jquery/jquery.js' %}"></script>
+  <script src="{% static 'vendor/libs/popper/popper.js' %}"></script>
+  <script src="{% static 'vendor/js/bootstrap.js' %}"></script>
+  <script src="{% static 'vendor/js/bs-stepper.min.js' %}"></script>
+  <script src="{% static 'vendor/libs/perfect-scrollbar/perfect-scrollbar.js' %}"></script>
+  <script src="{% static 'vendor/libs/node-waves/node-waves.js' %}"></script>
+
+  <script src="{% static 'vendor/libs/hammer/hammer.js' %}"></script>
+  <script src="{% static 'vendor/libs/i18n/i18n.js' %}"></script>
+  <script src="{% static 'vendor/libs/typeahead-js/typeahead.js' %}"></script>
+
+  <script src="{% static 'vendor/js/menu.js' %}"></script>
+  <!-- endbuild -->
+
+  <!-- Vendors JS -->
+  <script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+  <script src="{% static 'vendor/libs/swiper/swiper.js' %}"></script>
+  <script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+
+  <!-- Main JS -->
+  <script src="{% static 'js/main.js' %}"></script>
+
+  <!-- Page JS -->
+  <script src="{% static 'js/dashboards-analytics.js' %}"></script>
+
+  <!-- Vue JS -->
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-select2@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src="{% static 'js/pages-auth.js' %}"></script>
+
+  <script>
+
+  new Vue({
+      el: "#modals-vue",
+      delimiters: ['[[', ']]'],
+      data: {
+        status_sync: "",
+        update_at: "",
+        cambiar_pass: "{{cambiar_pass}}",
+        nueva_pass: {
+          id_usuario: "",
+          nueva_pass: "",
+          repetir_pass: "",
+        }
+      },
+      mounted() {
+        if (this.cambiar_pass) {
+          document.getElementById('cambiar_pass_button').click()
+        }
+      },
+      created() {
+
+      },
+      methods: {
+        cambiarPass(){
+          if(this.nueva_pass.nueva_pass == this.nueva_pass.repetir_pass){
+            console.log("holi")
+          }
+        }
+      }
+    })
+    new Vue({
+      el: "#navbar-collapse",
+      delimiters: ['[[', ']]'],
+      data: {
+        status_sync: "",
+        update_at: "",
+        cambiar_pass: "{{cambiar_pass}}",
+        
+      },
+      mounted() {
+        if (this.cambiar_pass) {
+          document.getElementById('cambiar_pass_button').click()
+        }
+      },
+      created() {
+
+      },
+      methods: {
+        
+      }
+    })
+  </script>
+
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('layout-menu');
+      sidebar.classList.toggle('menu');
+
+      sidebar.classList.toggle('layout-menu-collapsed');
+      sidebar.classList.toggle('menu-collapsed');
+
+    }
+  </script>
+  {% block js %}
+  {% endblock js %}
+
+  <script src="{% static 'js/pages-auth.js' %}"></script>
+  <script src="{% static 'vendor/libs/formvalidation/dist/js/FormValidation.min.js' %}"></script>
+  <script src="{% static 'vendor/libs/formvalidation/dist/js/plugins/Bootstrap5.min.js' %}"></script>
+  <script src="{% static 'vendor/libs/formvalidation/dist/js/plugins/AutoFocus.min.js' %}"></script>
+
+</body>
+
+</html>

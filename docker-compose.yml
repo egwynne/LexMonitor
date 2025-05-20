@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  web: &web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    image: safeware/gestion-banco-app:latest
+    command: python3 manage.py runserver 0.0.0.0:8090
+    volumes:
+      - ./front/:/code
+      - ./descargas/:/descargas
+    ports:
+      - "8090:8090"
+    expose:
+      - "8090"
+    depends_on:
+      - db
+    env_file:
+      - ./front/conf/.env
+    networks:
+      - django-gestion-banco-dev
+
+  db:
+    image: mysql:8.0
+    env_file:
+      - ./front/conf/.env
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata_gestion_banco:/var/lib/mysql
+    networks:
+      - django-gestion-banco-dev
+
+networks:
+  django-gestion-banco-dev:
+    driver: bridge
+
+volumes:
+  dbdata_gestion_banco:

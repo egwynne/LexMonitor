@@ -1,0 +1,280 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %}
+Estadisticas | LeyTracker
+{% endblock title %}
+
+{% block css %}
+<style>
+
+    .loading-screen {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        color: white;
+        font-size: 24px;
+    }
+</style>
+
+{% endblock css %}
+
+
+{% block content %}
+
+<div id="app">
+    <div class="page-breadcrumb breadcrumb-font d-none d-md-flex align-items-center">
+        <h3 class="content-header-title float-left mb-0" style="margin-right: 15px;">Estadisticas</h3>
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    <li class="breadcrumb-item"><a href="javascript:;"><i class="tf-icons ti ti-home"></i></a>
+                    </li>
+
+                    <li class="breadcrumb-item active mt-1" aria-current="page">Estadisticas</li>
+
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <div class="loading-screen" id="loadingScreen">
+        <div>Cargando...</div>
+    </div>
+    <div id="vista-principal" class="row d-none">
+        <div class="row mt-3">
+            <div class="col-12 mb-0 d-flex align-items-center">
+                <h5>
+                    <span class="badge bg-info me-1" style="font-size: 14px;" v-text="'1'"></span>
+                    Información Impacto:
+                </h5>
+            </div>
+            <div class="col-12 col-lg-4  mt-3 order-1 order-lg-2 mb-4 mb-lg-0">
+                <div class="card">
+                    <div class="d-flex justify-content-center align-items-center card-body">
+                        <div class="text-center">
+                            <div class="badge rounded-pill bg-success p-2">
+                                <i class="ti ti-files ti-sm "></i>
+                            </div>
+                            <h2 class="mt-1 mb-1" style="font-weight: lighter;">
+                                [[total_regulaciones]]
+                            </h2>
+                            <p class="mb-0 text-secondary">Regulaciones Activas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4  mt-3 order-1 order-lg-2 mb-4 mb-lg-0">
+                <div class="card">
+                    <div class="d-flex justify-content-center align-items-center card-body">
+                        <div class="text-center">
+                            <div class="badge rounded-pill bg-body p-2">
+                                <i class="ti ti-user ti-sm "></i>
+                            </div>
+                            <h2 class="mt-1 mb-1" style="font-weight: lighter;">
+                                [[impacto.implementacion]]
+                            </h2>
+                            <p class="mb-0 text-secondary">IMPLEMENTACION</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4  mt-3 order-1 order-lg-2 mb-4 mb-lg-0">
+                <div class="card">
+                    <div class="d-flex justify-content-center align-items-center card-body">
+                        <div class="text-center">
+                            <div class="badge rounded-pill bg-danger p-2">
+                                <i class="ti ti-x ti-sm "></i>
+                            </div>
+                            <h2 class="mt-1 mb-1" style="font-weight: lighter;">
+                                [[impacto.sin_definir]]
+                            </h2>
+                            <p class="mb-0 text-secondary">SIN DEFINIR</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="row">
+            <div class="col-12 col-lg-4  mt-3 order-1 order-lg-2 mb-4 mb-lg-0">
+                <div class="card">
+                    <div class="d-flex justify-content-center align-items-center card-body">
+                        <div class="text-center">
+                            <div class="badge rounded-pill bg-success p-2">
+                                <i class="ti ti-bandage ti-sm "></i>
+                            </div>
+                            <h2 class="mt-1 mb-1" style="font-weight: lighter;">
+                                [[impacto.bajo]]
+
+                            </h2>
+                            <p class="mb-0 text-secondary">BAJO</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4  mt-3 order-1 order-lg-2 mb-4 mb-lg-0">
+                <div class="card">
+                    <div class="d-flex justify-content-center align-items-center card-body">
+                        <div class="text-center">
+                            <div class="badge rounded-pill bg-warning p-2">
+                                <i class="ti ti-bell-ringing ti-sm "></i>
+                            </div>
+                            <h2 class="mt-1 mb-1" style="font-weight: lighter;">
+                                [[impacto.medio]]
+
+                            </h2>
+                            <p class="mb-0  text-secondary">MEDIO</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4  mt-3 order-1 order-lg-2 mb-4 mb-lg-0">
+                <div class="card">
+                    <div class="d-flex justify-content-center align-items-center card-body">
+                        <div class="text-center">
+                            <div class="badge rounded-pill bg-primary p-2">
+                                <i class="ti ti-urgent ti-sm "></i>
+                            </div>
+                            <h2 class="mt-1 mb-1" style="font-weight: lighter;">
+                                [[impacto.alto]]
+
+                            </h2>
+                            <p class="mb-0  text-secondary">ALTO</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="row mt-3">
+            
+            <div class="col-12 mb-4 order-5 order-xxl-0">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title mb-0">
+                            <h5 class="m-0">Detalle de Regulaciones por Impacto</h5>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-none d-lg-flex vehicles-progress-labels mb-4">
+                            <div class="vehicles-progress-label on-the-way-text"  v-if="impacto.porcentaje_implementacion>0"
+                                :style="{ width: impacto.porcentaje_implementacion + '%' }">
+                                Implementacion</div>
+                            <div class="vehicles-progress-label unloading-text" v-if="impacto.porcentaje_bajo>0"
+                                :style="{ width: impacto.porcentaje_bajo + '%' }">Bajo</div>
+                            <div class="vehicles-progress-label loading-text" v-if="impacto.porcentaje_medio>0"
+                                :style="{ width: impacto.porcentaje_medio + '%' }">
+                                Medio
+                            </div>
+                            <div class="vehicles-progress-label waiting-text text-nowrap" v-if="impacto.porcentaje_alto>0"
+                                :style="{ width: impacto.porcentaje_alto + '%' }">Alto</div>
+                            <div class="vehicles-progress-label waiting-text text-nowrap" v-if="impacto.porcentaje_sin_definir>0"
+                                    :style="{ width: impacto.porcentaje_alto + '%' }">Sin Asignar</div>
+                        </div>
+                        <div class="vehicles-overview-progress progress rounded-2 my-4" style="height: 46px;">
+                            <div class="progress-bar fw-medium text-start bg-body text-dark px-3 rounded-0" v-if="impacto.porcentaje_implementacion>0"
+                                role="progressbar" :style="{ width: impacto.porcentaje_implementacion + '%' }"
+                                :aria-valuenow="impacto.porcentaje_implementacion" aria-valuemin="0" aria-valuemax="100">[[impacto.porcentaje_implementacion]]%</div>
+                            
+                            <div class="progress-bar fw-medium text-start bg-success px-3" role="progressbar" v-if="impacto.porcentaje_bajo>0"
+                                :style="{ width: impacto.porcentaje_bajo + '%' }" :aria-valuenow="impacto.porcentaje_bajo"
+                                aria-valuemin="0" aria-valuemax="100">[[impacto.porcentaje_bajo]]%</div>
+                            
+                            <div class="progress-bar fw-medium text-start bg-warning px-3" role="progressbar" v-if="impacto.porcentaje_medio>0"
+                                :style="{ width: impacto.porcentaje_medio + '%' }" :aria-valuenow="impacto.porcentaje_medio"
+                                aria-valuemin="0" aria-valuemax="100">[[impacto.porcentaje_medio]]%</div>
+                            
+                            <div class="progress-bar fw-medium text-start bg-primary px-2 px-lg-2 px-xxl-3" v-if="impacto.porcentaje_alto>0"
+                                role="progressbar" :style="{ width: impacto.porcentaje_alto + '%' }"
+                                :aria-valuenow="impacto.porcentaje_alto" aria-valuemin="0" aria-valuemax="100">[[impacto.porcentaje_alto]]%</div>
+                            
+                            <div class="progress-bar fw-medium text-start bg-danger px-2 rounded-0 px-lg-2 px-xxl-3" v-if="impacto.porcentaje_sin_definir>0"
+                                role="progressbar" :style="{ width: impacto.porcentaje_sin_definir + '%' }"
+                                :aria-valuenow="impacto.porcentaje_sin_definir" aria-valuemin="0" aria-valuemax="100">[[impacto.porcentaje_sin_definir]]%</div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+
+
+</div>
+
+{% endblock content %}
+
+{%block js%}
+<script>
+    $(document).ready(function () {
+        $("#index-sidebar").addClass("active")
+    })
+</script>
+
+
+<script>
+    new Vue({
+        el: "#app",
+        delimiters: ['[[', ']]'],
+        data: {
+            year: "",
+            month: "",
+            selectedDate: "",
+            total_regulaciones:0,
+            impacto: {
+                implementacion:0,
+                bajo:0,
+                medio:0,
+                alto:0,
+                porcentaje_implementacion: 25,
+                porcentaje_bajo: 25,
+                porcentaje_medio: 25,
+                porcentaje_alto: 25,
+            },
+        },
+        mounted() {
+            this.get_dashboards()
+            },
+        computed: {
+        },
+        created() {
+        },
+        methods: {
+            get_dashboards() {
+                let body = {
+                }
+                axios.post("/api/get/dashboards/", body).then((response) => {
+                    console.log(response.data)
+                    this.total_regulaciones= response.data.total_regulaciones
+                    this.impacto = response.data.impacto
+                    this.removeLoading()
+                    
+                });
+            },
+            removeLoading() {
+                const elemento = document.getElementById('vista-principal');
+                elemento.classList.remove('d-none');
+                document.getElementById('loadingScreen').style.display = 'none';
+            },
+        }
+
+    })
+</script>
+
+{%endblock js%}

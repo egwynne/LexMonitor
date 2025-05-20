@@ -1,0 +1,486 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+Usuarios | LeyTracker
+{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" />
+<style>
+  td {
+    font-size: 0.9em;
+  }
+
+  .swal-toast {
+            background-color: #50C878!important;
+            color: white!important; 
+            box-shadow: none!important;
+        }
+
+    
+.swal-toast .swal2-title {
+    color: white !important; /* Asegúrate de que el título sea blanco */
+}
+
+.swal-toast .swal2-content {
+    color: white !important; /* Asegúrate de que el contenido sea blanco */
+}
+</style>
+{% endblock css %}
+
+{% block content %}
+
+<div id="app">
+  <div class="page-breadcrumb breadcrumb-font d-none d-md-flex align-items-center mb-3">
+    <h3 class="content-header-title float-left mb-0" style="margin-right: 15px;">Usuarios</h3>
+    <div class="ps-3">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 p-0">
+          <li class="breadcrumb-item"><a href="javascript:;"><i class="tf-icons ti ti-home"></i></a>
+          </li>
+          <li class="breadcrumb-item active mt-1" aria-current="page">Administrador</li>
+
+          <li class="breadcrumb-item active mt-1" aria-current="page">Usuarios</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 order-1 order-lg-2 mb-4 mb-lg-0">
+      <div class="card">
+        <div class="card-header">
+          <div class="row d-flex align-items-center">
+            <div class="col-12 col-lg-10 d-flex align-items-center">
+              <h5>Usuarios Registrados</h5>
+            </div>
+            <div class="col-12 col-lg-2 btn-end">
+              <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasBackdrop" aria-controls="offcanvasBackdrop"
+                class="btn btn-primary waves-effect waves-light w-100" data-bs-toggle="modal"
+                @click="ToggleModal(false,{})" data-bs-target="#pricingModal">
+                <i class="tf-icons ti ti-plus"></i>
+                &nbsp;Agregar Usuario
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="row">
+            <div class="col-12  mt-1">
+              <div class="row">
+                <div class="col-6 col-lg-2">
+                  <label class="control-label">Nombre :</label>
+                  <input class="form-control" v-model="filtros.nombre">
+
+                </div>
+                <div class="col-6 col-lg-2">
+                  <label class="control-label">Apellido :</label>
+                  <input class="form-control" v-model="filtros.apellido">
+
+                </div>
+                <div class="col-6 col-lg-2">
+                  <label class="control-label">Correo :</label>
+                  <input class="form-control" v-model="filtros.correo">
+
+                </div>
+                <div class="col-6 col-lg-2">
+                  <label class="control-label">Estado :</label>
+                  <select class="form-select" id="dropdownFactibilidad" v-model="filtros.estado">
+                    <option value="-1">TODOS</option>
+                    <option value="0">INACTIVO</option>
+                    <option value="1">ACTIVO</option>
+                  </select>
+                </div>
+                <div class="col-6 col-lg-2">
+                  <label class="control-label">Tipo Usuario :</label>
+                  <select class="form-select" id="dropdownFactibilidad" v-model="filtros.tipo_usuario">
+                    <option value="-1">TODOS</option>
+                    <option value="0">Administrador</option>
+                    <option value="1">Publicador</option>
+                    <option value="2">Editor</option>
+                    <option value="3">Lector</option>
+                  </select>
+                </div>
+                <div class="col-12 col-lg-2 d-flex flex-column justify-content-center align-items-center mt-3">
+                  <button class="btn btn-primary w-100 mb-2" @click="fetchData">
+                    <i class="tf-icons ti ti-search"></i>
+                    Buscar
+                  </button>
+                  <button class="btn btn-secondary w-100" @click="limpiarFiltros">
+                    <i class="tf-icons ti ti-clear-all"></i>
+                    Limpiar
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
+
+          </div>
+
+        </div>
+
+        <div class="row mt-5">
+          <div class="col-12 col-lg-12">
+
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th width="24%" class="link-primary " style="font-size:  0.86rem;">Nombre</th>
+                    <th width="20%">Correo</th>
+                    <th width="10%">Telefono</th>
+                    <th width="20%">Tipo Usuario</th>
+                    <th width="3%">Estado</th>
+                    <th width="3%"></th>
+                  </tr>
+                </thead>
+                <tbody class="table-border-bottom-0">
+                  <tr v-for="user in show_usuarios">
+                    <td class="link-primary ">
+                      <a><strong v-text="user.nombre + ' ' + user.apellido"></strong></a>
+                      <!--<a href="/pago_clientes"><strong>{{cliente.compania.empresa |upper}}</strong></a> -->
+                    </td>
+                    <td><strong v-text="user.correo"></strong></td>
+                    <td v-text="user.telefono"></td>
+
+                    <td v-text="user.tipo_name"> </td>
+                    <td>
+
+                      <span v-if="user.status" class="badge bg-label-success me-1">Activo</span>
+                      <span v-else class="badge bg-label-danger me-1">Inactivo</span>
+
+                    </td>
+                    <td align="center">
+                      <div class="dropdown">
+                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                          <i class="ti ti-dots-vertical"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBackdrop"
+                            aria-controls="offcanvasBackdrop" @click="ToggleModal(true,user)" data-bs-toggle="modal"
+                            data-bs-target="#pricingModal"><i class="ti ti-pencil me-1"></i> Editar </a>
+
+                          <a class="dropdown-item" @click="CambiarEstado(user)">
+                            <i v-if="user.status" class="ti ti-x me-1"></i>
+                            <i v-else class="ti ti-check me-1"></i>[[user.status? 'Desactivar':'Activar']]
+                          </a>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td>&nbsp;</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="margin-bottom: 40px; text-align: center;">
+                <button class="btn btn-md btn-outline-primary mr-2" :disabled="current_page == 1"
+                  @click="goToPage(1);"><i class="ti ti-chevrons-left"
+                    style="margin-left: 0px; font-size:1rem;"></i></button>
+                <button class="btn btn-md btn-outline-primary mr-2" :disabled="current_page == 1"
+                  @click="addpage(-1);"><i class="ti ti-chevron-left"
+                    style="margin-left: 0px; font-size:1rem;"></i></button>
+                <template v-if="totalPages <= 10">
+                  <!-- Si hay 10 páginas o menos, mostrar todas las páginas -->
+                  <button v-for="pageNumber in totalPages" :key="pageNumber" class="btn btn-md btn-outline-primary mr-2"
+                    :class="{ active: current_page === pageNumber }" @click="goToPage(pageNumber)">
+                    [[ pageNumber ]]
+                  </button>
+                </template>
+                <template v-else>
+                  <!-- Si hay más de 10 páginas, mostrar solo 10 páginas alrededor de la página actual -->
+                  <button v-for="pageNumber in visiblePages" :key="pageNumber"
+                    class="btn btn-md btn-outline-primary mr-2" :class="{ active: current_page === pageNumber }"
+                    @click="goToPage(pageNumber)">
+                    [[ pageNumber ]]
+                  </button>
+                </template>
+                <button class="btn btn-md btn-outline-primary mr-2" :disabled="current_page == totalPages"
+                  @click="addpage(1);"><i class="ti ti-chevron-right"
+                    style="margin-left: 0px; font-size:1rem;"></i></button>
+                <button class="btn btn-md btn-outline-primary mr-2" :disabled="current_page == totalPages"
+                  @click="goToPage(totalPages);"><i class="ti ti-chevrons-right"
+                    style="margin-left: 0px; font-size:1rem;"></i></button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBackdrop" aria-labelledby="offcanvasBackdropLabel">
+    <div class="offcanvas-header">
+      <h4 id="offcanvasBackdropLabel" class="offcanvas-title" style="padding-left: 4.5em;">
+        [[editar_modal?'Editar':'Nuevo']] Usuario</h4>
+      <button id="close_modal" type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+        aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body mx-0 pt-0 flex-grow-0">
+      <div class="row">
+        <div class="col-12">
+          <h5 class="mb-0">Datos Personales</h5> <small class="text-muted float-end"></small>
+        </div>
+        <div class="col-12 mt-3">
+          <label class="control-label">Nombres:</label>
+          <input v-model="nuevo_usuario.nombre" type="text" class="form-control">
+        </div>
+        <div class="col-12 mt-3">
+          <label class="control-label">Apellidos:</label>
+          <input v-model="nuevo_usuario.apellido" type="text" class="form-control">
+        </div>
+        <div class="col-12 mt-3">
+          <label class="control-label">Correo:</label>
+          <input v-model="nuevo_usuario.correo" type="text" class="form-control">
+        </div>
+        <div class="col-12 mt-3">
+          <label class="control-label">Telefono:</label>
+          <input v-model="nuevo_usuario.telefono" type="text" class="form-control">
+        </div>
+        <div class="col-12 mt-3">
+          <label class="control-label">Tipo Usuario:</label>
+          <select class="form-select" id="dropdownContrato" v-model="nuevo_usuario.tipo">
+            <option value="-1" selected disabled>Seleccione</option>
+            {% for type in user_types %}
+            <option value="{{type.id}}">{{type.nombre}}</option>
+            {% endfor %}
+
+          </select>
+        </div>
+        <div class=" mt-3 form-password-toggle" v-if="!editar_modal">
+          <label class="control-label">Contraseña:</label>
+          <div class="input-group input-group-merge">
+            <input type="password" id="password" class="form-control" v-model="nuevo_usuario.pass"
+              placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+              aria-describedby="password" />
+          </div>
+        </div>
+        <div class="col-12 mt-5">
+          <button v-if="editar_modal" v-on:click="editar_user()" class="btn btn-primary w-100">Editar Usuario</button>
+          <button v-else v-on:click="create_user()" class="btn btn-primary w-100">Crear Usuario</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+
+
+{% endblock content %}
+
+{% block js %}
+<script>
+  $(document).ready(function () {
+    $("#usuarios-sidebar").addClass("active")
+  })
+</script>
+
+
+<script>
+  new Vue({
+    el: "#app",
+    delimiters: ['[[', ']]'],
+    data: {
+      usuarios: [],
+      nuevo_usuario: {
+        nombre: "",
+        apellido: "",
+        telefono: "",
+        rut: "",
+        tipo: "-1",
+        correo: "",
+        pass: "",
+        repeat_pass: "",
+      },
+      filtros: {
+        nombre: "",
+        apellido: "",
+        correo: "",
+        tipo_usuario: "-1",
+        estado: "1",
+        pagina: 1,
+        pageSize: 10,
+      },
+      totalPages: 1,
+      current_page: 1,
+      show_usuarios: [],
+      editar_modal: false,
+
+    },
+    mounted() {
+      this.fetchData()
+    },
+    computed: {
+      visiblePages() {
+        const totalPages = this.totalPages;
+        const current_page = this.current_page;
+        let start = Math.max(1, current_page - 4);
+        let end = Math.min(totalPages, current_page + 5);
+
+        const extraPagesBefore = 4 - (current_page - start);
+        const extraPagesAfter = 5 - (end - current_page);
+        if (extraPagesBefore > 0) {
+          end = Math.min(totalPages, end + extraPagesBefore);
+          start = Math.max(1, start - extraPagesBefore);
+        } else if (extraPagesAfter > 0) {
+          start = Math.max(1, start - extraPagesAfter);
+          end = Math.min(totalPages, end + extraPagesAfter);
+        }
+
+        return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+      }
+    },
+    created() {
+    },
+    methods: {
+      goToPage(pageNumber) {
+        this.filtros.pagina = pageNumber;
+        this.fetchData()
+      },
+      addpage(value) {
+        this.filtros.pagina += value
+        this.fetchData()
+      },
+      limpiarFiltros() {
+        this.filtros.nombre = ""
+        this.filtros.apellido = ""
+        this.filtros.correo = ""
+        this.filtros.tipo_usuario = "-1"
+        this.filtros.estado = "1"
+        this.filtros.pagina = "1"
+        this.fetchData()
+      },
+      fetchData() {
+        axios.post("/api/get/usuarios/?page=" + this.filtros.pagina + "&page_size=" + this.filtros.pageSize, this.filtros).then((response) => {
+          this.show_usuarios = response.data.usuarios
+          this.totalPages = response.data.totalPages
+          this.current_page = response.data.currentPage
+        });
+      },
+      create_user() {
+        axios.post("/api/create/usuario/", this.nuevo_usuario).then((response) => {
+          var boton = document.getElementById("close_modal");
+          boton.click();
+          this.clean_user();
+          Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: 'Se registro con exito el usuario.',
+            confirmButtonText: 'Ok',
+            didClose: () => {
+              location.reload();  // Recargar la página
+            }
+          });
+
+        });
+      },
+      editar_user() {
+        let body = {
+          editar_user:this.nuevo_usuario,
+        }
+        self=this;
+        Swal.fire({
+          title: '¿Estás Seguro que quieres editar este usuario?',
+          icon: 'question',
+          showDenyButton: true,
+          confirmButtonText: 'Confirmar',
+          denyButtonText: 'Cancelar',
+          timer: 10000,
+        }).then(function (isconfirm) {
+          if (isconfirm.value === true) {
+            axios.post("/api/edit/usuario/", body).then((response) => {
+              self.cerrarModal()
+              Swal.fire({
+                        position: 'bottom-end',
+                        title: 'Se edito con exito el usuario.',
+                        showConfirmButton: false,
+                        toast:true,
+                        timer: 3000,
+                        customClass: {
+                            popup: 'swal-toast'
+                        }
+                    });
+            })
+          }
+        })
+      },
+      clean_user() {
+        this.nuevo_usuario = {
+          nombre: "",
+          apellido: "",
+          telefono: "",
+          rut: "",
+          tipo: "-1",
+          correo: "",
+          pass: "",
+          repeat_pass: "",
+        }
+      },
+      CambiarEstado(user) {
+        self = this;
+        const text = user.status ? 'Desactivar' : 'Activar';
+        const text_swal = user.status ? 'desactivo' : 'activo';
+        let body = {
+          new_status: !user.status,
+          id_user: user.id
+        }
+        Swal.fire({
+          title: '¿Estás Seguro que quieres ' + text + ' a este usuario?',
+          icon: 'question',
+          showDenyButton: true,
+          confirmButtonText: 'Confirmar',
+          denyButtonText: 'Cancelar',
+          timer: 5000,
+        }).then(function (isconfirm) {
+          if (isconfirm.value === true) {
+            axios.post("/api/change/status/user/", body).then((response) => {
+              user.status = !user.status
+              Swal.fire({
+                        position: 'bottom-end',
+                        title: 'Se '+text_swal+' con exito el usuario.',
+                        showConfirmButton: false,
+                        toast:true,
+                        timer: 3000,
+                        customClass: {
+                            popup: 'swal-toast'
+                        }
+                    });
+            })
+          }
+        })
+
+      },
+      ToggleModal(editar, value) {
+        this.editar_modal = editar;
+        if (editar) {
+          this.nuevo_usuario = value
+        } else {
+          this.clean_user()
+        }
+      },
+      cerrarModal() {
+                var offcanvasElement = document.getElementById('offcanvasBackdrop');
+                var offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+                if (offcanvas) {
+                    offcanvas.hide();
+                }
+            }
+
+    }
+
+  })
+</script>
+{% endblock js %}

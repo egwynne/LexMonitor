@@ -1,0 +1,62 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %}
+Inicio | LeyTracker
+{% endblock title %}
+
+{% block css %}
+<style>
+  #vista-principal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+  }
+
+  .img-fondo {
+    display: block;
+  }
+
+  .img-fluid {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
+
+{% endblock css %}
+
+
+{% block content %}
+
+<div id="app">
+  <div class="page-breadcrumb breadcrumb-font d-none d-md-flex align-items-center">
+    <h3 class="content-header-title float-left mb-0" style="margin-right: 15px;">Inicio</h3>
+    <div class="ps-3">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0 p-0">
+          <li class="breadcrumb-item"><a href="javascript:;"><i class="tf-icons ti ti-home"></i></a>
+          </li>
+
+          <li class="breadcrumb-item active mt-1" aria-current="page">Inicio</li>
+
+        </ol>
+      </nav>
+    </div>
+  </div>
+  <div id="vista-principal" class="row">
+    <img class="img img-fondo img-fluid w-75 text-center" src="{% static 'img/backgrounds/index_photo2.png' %}" alt="">
+  </div>
+</div>
+
+
+{% endblock content %}
+
+{%block js%}
+<script>
+  $(document).ready(function () {
+    $("#index-sidebar").addClass("active")
+  })
+</script>
+
+{%endblock js%}

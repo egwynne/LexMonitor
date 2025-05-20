@@ -1,0 +1,528 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+Ver | LeyTracker
+{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" />
+<style>
+    td {
+        font-size: 0.9em;
+    }
+
+    .swal-toast {
+            background-color: #50C878!important;
+            color: white!important; 
+            box-shadow: none!important;
+        }
+
+    
+.swal-toast .swal2-title {
+    color: white !important; /* Asegúrate de que el título sea blanco */
+}
+
+.swal-toast .swal2-content {
+    color: white !important; /* Asegúrate de que el contenido sea blanco */
+}
+
+.loading-screen {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000; /* Asegura que esté por encima de otros elementos */
+        color: white;
+        font-size: 24px;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+
+<div id="app">
+    <div class="page-breadcrumb breadcrumb-font  d-md-flex align-items-center mb-3">
+        <h3 class="content-header-title float-left mb-0" style="margin-right: 15px;">Ver Regulacion</h3>
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    <li class="breadcrumb-item"><a href="javascript:;"><i class="tf-icons ti ti-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item active mt-1" aria-current="page">Regulaciones</li>
+
+                    <li class="breadcrumb-item active mt-1" aria-current="page">Ver</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <div  class="loading-screen" id="loadingScreen">
+        <div>Cargando...</div>
+    </div>
+    <div id="vista-principal" class="row d-none" >
+        <div class="col-12 order-1 order-lg-2 mb-4 mb-lg-0">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row d-flex align-items-center">
+                        <div class="col-12 col-lg-9 d-flex align-items-center">
+                            <h3>Ver Regulacion:</h3>
+                        </div>
+                        <!--<div class="col-2 btn-end">
+              <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasBackdrop" aria-controls="offcanvasBackdrop" data-bs-target="#pricingModal"
+                class="btn btn-primary waves-effect waves-light" data-bs-toggle="modal">
+                Agregar Usuario
+              </button>
+            </div>-->
+                        <div class="col-12 col-lg-3 btn-end">
+                            <label class="control-label">Fecha Creación:</label>
+                            <input type="date" class="form-control" v-model="ver_regulacion.fecha_creacion" disabled>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="col-12 mb-0 d-flex align-items-center">
+                        <h5>
+                            <span class="badge bg-info me-1" style="font-size: 14px;" v-text="'1'"></span>
+                            Cabeceras:
+                        </h5>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 col-lg-3  mt-1">
+                            <label class="control-label">Correlativo:</label>
+
+                            <div class="input-group input-group-merge">
+                                <span class="input-group-text"><i class="ti ti-hash"></i></span>
+                                <input class="form-control" v-model="ver_regulacion.correlativo" disabled>
+
+                            </div>
+                        </div>
+
+
+                        <div class="col-8 col-lg-9  mt-1">
+                            <label class="control-label">Politica Publica :</label>
+                            <input class="form-control" v-model="ver_regulacion.nombre" disabled>
+
+                        </div>
+
+                        <div class="col-12 col-lg-12  mt-3">
+                            <label class="control-label">Estado Tramite :</label>
+                            <input class="form-control" v-model="ver_regulacion.estado_tramite" disabled >
+                        </div>
+
+
+                    </div>
+                    <div class="row">
+                        <div class="col-6 col-lg-3 mt-3">
+                            <label class="control-label">Impacto :</label>
+                            <select class="form-select" id="dropdownFactibilidad" v-model="ver_regulacion.impacto" disabled>
+                                <option value="-1" disabled>SIN ASIGNAR</option>
+                                <option value="0">IMPLEMENTACION</option>
+                                <option value="1">BAJO</option>
+                                <option value="2">MEDIO</option>
+                                <option value="3">ALTO</option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-6 col-lg-3  mt-3 ">
+                            <label class="control-label">Factibilidad:</label>
+                            <select class="form-select" id="dropdownFactibilidad"
+                                v-model="ver_regulacion.factibilidad" disabled>
+                                <option value="-1" disabled>SIN ASIGNAR</option>
+                                <option value="0">IMPLEMENTACION</option>
+                                <option value="1">BAJO</option>
+                                <option value="2">MEDIO</option>
+                                <option value="3">ALTO</option>
+                            </select>
+                        </div>
+                        
+
+                        <div class="col-6 col-lg-3 mt-3 mb-1">
+                            <label class="control-label">Servicio :</label>
+                            <select class="form-select" id="dropdownFactibilidad" v-model="ver_regulacion.servicio" disabled>
+                                <option value="-1" disabled>SIN ASIGNAR</option>
+                                <option value="0">S</option>
+                                <option value="1">M</option>
+                                <option value="2">L</option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-6 col-lg-3 mt-3">
+                            <label class="control-label">Priorización :</label>
+                            <select class="form-select" id="dropdownFactibilidad"
+                                v-model="ver_regulacion.priorizacion" disabled>
+                                <option value="-1" disabled>SIN ASIGNAR</option>
+                                <option value="0">POR DEFINIR</option>
+                                <option value="1">INCIDENCIA</option>
+                                <option value="2">INFORMAR</option>
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        
+                        <div class="col-6 col-lg-3 mt-3 mb-1">
+                            <label class="control-label">Impacto Publico:</label>
+                            <select class="form-select" id="dropdownFactibilidad"
+                                v-model="ver_regulacion.impacto_deb" disabled>
+                                <option value="-1" disabled>SIN ASIGNAR</option>
+                                <option value="4">SIN DEFINIR</option>
+                                <option value="1">BAJO</option>
+                                <option value="2">MEDIO</option>
+                                <option value="3">ALTO</option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-6 col-lg-3  mt-3">
+                            <label class="control-label">ESG :</label>
+                            <select class="form-select" id="dropdownFactibilidad" v-model="ver_regulacion.esg" disabled>
+                                <option value="-1" disabled>SIN ASIGNAR</option>
+                                <option value="0">IMPLEMENTACION</option>
+                                <option value="1">E</option>
+                                <option value="2">S</option>
+                                <option value="3">G</option>
+                                <option value="3">N/A</option>
+                            </select>
+
+                        </div>
+
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12 mb-0 mt-1 d-flex align-items-center">
+                            <h5>
+                                <span class="badge bg-info me-1 " style="font-size: 14px;" v-text="'2'"></span>
+                                Información:
+                            </h5>
+                        </div>
+                        <div class="col-12 col-lg-6 mt-3">
+                            <label class="control-label">Tipo Actividad:</label>
+                            <input class="form-control" v-model="ver_regulacion.tipo_acti" disabled>
+
+                        </div>
+                        <div class="col-12 col-lg-6 mt-3">
+                            <label class="control-label">Origen:</label>
+                            <input class="form-control" v-model="ver_regulacion.origen" disabled>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-lg-6 mt-3">
+                            <label class="control-label">Responsabilidad Gerencial:</label>
+                            <input class="form-control" v-model="ver_regulacion.responsabilidad_geren" disabled>
+
+                        </div>
+
+                        <div class="col-12 col-lg-6 mt-3">
+                            <label class="control-label">Responsable:</label>
+                            <input class="form-control" v-model="ver_regulacion.prof_respon" disabled>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-lg-6 mt-3 mb-3">
+                            <label class="control-label">Ámbito Afectado:</label>
+                            <input class="form-control" v-model="ver_regulacion.ambito_afectado" disabled>
+
+                        </div>
+
+                        <div class="col-12 col-lg-6 mt-3 mb-3">
+                            <label class="control-label">Foco/Tema:</label>
+                            <input class="form-control" v-model="ver_regulacion.foco" disabled>
+
+                        </div>
+
+
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12 col-lg-9 d-flex align-items-center">
+                            <h5>
+                                <span class="badge bg-info me-1 mb-1" style="font-size: 14px;" v-text="'3'"></span>
+                                Ultimo Comentario:
+                            </h5>
+                        </div>
+                        <div class="col-12 col-lg-3 btn-end">
+                            <label class="control-label">Fecha Comentario:</label>
+                            <input type="date" class="form-control" v-model="ver_regulacion.fecha_comentario" disabled>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-lg-6 mt-3">
+                            <label class="control-label">Referencia:</label>
+                            <input class="form-control" v-model="ver_regulacion.referencia" disabled>
+
+                        </div>
+                        <div class="col-12 col-lg-6 mt-3">
+                            <label class="control-label">Autor:</label>
+                            <input class="form-control" v-model="ver_regulacion.autor_text" disabled>
+
+                        </div>
+                        <div class="col-12 col-lg-12 mt-3">
+                            <label class="control-label">Comentario:</label>
+                            <textarea rows="5" class="form-control" v-model="ver_regulacion.comentario"
+                                disabled></textarea>
+
+                        </div>
+
+                    </div>
+                    <div class="row d-flex align-items-start justify-content-start">
+                        <div class="col-12 col-lg-3 mt-3">
+                            <button class="btn btn-info w-100" data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasBackdrop" aria-controls="offcanvasBackdrop"
+                                @click="GetHistorialComentarios">Ver Historial
+                                Comentarios</button>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+
+
+
+            </div>
+            <div class="col-12 col-lg-4 mt-3">
+                <button class="btn btn-secondary" @click="Volver">Volver</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBackdrop" aria-labelledby="offcanvasBackdropLabel">
+        <div class="offcanvas-header">
+            <h4 id="offcanvasBackdropLabel" class="offcanvas-title" style="padding-left: 2.5em;">Historial Comentarios
+            </h4>
+            <button id="close_modal" type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body mx-0 pt-0 flex-grow-0">
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="mb-0">Comentarios Hechos</h5> <small class="text-muted float-end">Seleccione el
+                        comentario para obtener mas detalles</small>
+                </div>
+                <div v-for="(comentario, index) in historial_comentarios">
+                    <div class="accordion card mt-1" id="accordionExample">
+                        <div class="accordion-item">
+                            <h4 class="accordion-header" id="headingOne">
+                                <button :id="'comentario-' + comentario.id+'-'+index" class="accordion-button collapsed"
+                                    type="button" v-on:click="Toggle(comentario.id,index)">
+                                    <span class="badge bg-info me-1 text-center" style="font-size: 14px;display: flex; justify-content: center; align-items: center;"
+                                        v-text="comentario.fecha_comentario"></span>
+                                    &nbsp;&nbsp;
+                                    <hr>
+                                    <strong v-text="comentario.referencia"></strong>
+                                </button>
+                            </h4>
+
+                            <div :id="'target-' + comentario.id+'-'+index" class="accordion-collapse collapse">
+                                <div class="m-2 accordion-body dataTable-search">
+                                    <div class="card" style="position: relative;">
+
+                                        <div class="accordion-body">
+                                            <div class="col-12 mt-3">
+                                                <label class="control-label">Autor:</label>
+                                                <input type="text" class="form-control" v-model="comentario.autor_text" disabled>
+                                            </div>
+                                            <div class="col-12 mt-3">
+                                                <label class="control-label">Comentario:</label>
+                                                <textarea rows="20" class="form-control" v-model="comentario.comentario"
+                                                    disabled></textarea>
+                                            </div>
+                                            
+                                            
+                                        </div>
+
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBackdropCrear" aria-labelledby="offcanvasBackdropCrearLabel">
+        <div class="offcanvas-header">
+            <h4 id="offcanvasBackdropCrearLabel" class="offcanvas-title" style="padding-left: 4.5em;">Nuevo Comentario</h4>
+            <button id="close_modal_agregar" type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body mx-0 pt-0 flex-grow-0">
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="mb-0">Ingrese la información solicitada</h5> <small class="text-muted float-end">Ingrese la referencia y comentario</small>
+                </div>
+                <div class="col-12 mt-3">
+                    <label class="control-label">Referencia:</label>
+                    <input type="text" class="form-control" v-model="nuevo_comentario.referencia">
+                </div>
+
+                <div class="col-12 mt-3">
+                    <label class="control-label">Comentario:</label>
+                    <textarea rows="20" class="form-control" v-model="nuevo_comentario.comentario"></textarea>
+                </div>
+                <div class="col-12 mt-5">
+                    <button class="btn btn-primary w-100" @click="CrearComentario" aria-label="Close">Crear Comentario</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+        $("#lista-regulacion-sidebar").addClass("active")
+    })
+</script>
+
+
+<script>
+    new Vue({
+        el: "#app",
+        delimiters: ['[[', ']]'],
+        data: {
+            ver_regulacion: {
+                id: "{{id}}",
+                correlativo: "",
+                nombre: "",
+                factibilidad: "-1",
+                impacto: "-1",
+                priorizacion: "-1",
+                servicio: "-1",
+
+                tipo_acti: "",
+                responsabilidad_geren: "",
+                prof_respon: "",
+                impacto_deb: "-1",
+                origen: "",
+                ambito_afectado: "",
+                foco: "",
+                estado: "",
+                esg: "-1",
+                fecha_creacion: "",
+                comentario: "",
+                referencia: "",
+                fecha_comentario:"",
+                autor_text:"",
+                autor_id:""
+            },
+            historial_comentarios: [],
+            nuevo_comentario:{
+                "referencia":"",
+                "comentario":"",
+                "id_regulacion":"{{id}}"
+            }
+
+        },
+        mounted() {
+            this.fetchData()
+        },
+        created() {
+        },
+        methods: {
+            removeLoading(){
+                const elemento = document.getElementById('vista-principal');
+                elemento.classList.remove('d-none');
+                document.getElementById('loadingScreen').style.display = 'none';
+            },
+            fetchData() {
+                axios.get("/api/get/regulacion/?id=" + this.ver_regulacion.id).then((response) => {
+                    this.ver_regulacion = response.data.regulacion;
+                    this.removeLoading();
+                })
+            },
+            EditarRegulation() {
+                let body = {
+                    regulacion: this.ver_regulacion
+                };
+                axios.post("/api/editar/regulacion/", body).then((response) => {
+                    Swal.fire({
+                        title: "Éxito!",
+                        text: "Se creo con exito la Regulación!",
+                        icon: "success",
+                        confirmButtonText: 'Ver Lista',
+
+                    }).then(function (isconfirm) {
+                        if (isconfirm.isConfirmed) {
+                            //window.location.href = "/lista_regulaciones/"
+
+                        }
+                    })
+                });
+            },
+            GetHistorialComentarios() {
+                axios.get("/api/get/historial/comentarios/?id=" + this.ver_regulacion.id).then((response) => {
+                    this.historial_comentarios = response.data.comentarios
+                });
+            },
+            Volver() {
+                window.location.href = "/lista_regulaciones/";
+            },
+            Toggle(id_toggle, index) {
+                document.getElementById('target-' + id_toggle + '-' + index).classList.toggle("show");
+                document.getElementById('service-' + id_toggle + '-' + index).classList.toggle("collapsed");
+            },
+            CrearComentario(){
+                axios.post("/api/agregar/comentario/", this.nuevo_comentario).then((response) => {
+                    this.ver_regulacion.referencia = this.nuevo_comentario.referencia
+                    this.ver_regulacion.comentario = this.nuevo_comentario.comentario
+                    this.ver_regulacion.fecha_comentario = response.data.date
+                    this.nuevo_comentario.referencia = ""
+                    this.nuevo_comentario.comentario = ""
+                    this.cerrarModal()
+                    Swal.fire({
+                        position: 'bottom-end',
+                        title: 'Se agrego con exito el comentario',
+                        showConfirmButton: false,
+                        toast:true,
+                        timer: 3000,
+                        customClass: {
+                            popup: 'swal-toast'
+                        }
+                    });
+
+                    
+
+                });
+            },
+            cerrarModal() {
+                var offcanvasElement = document.getElementById('offcanvasBackdropCrear');
+                var offcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+                if (offcanvas) {
+                    offcanvas.hide();
+                }
+            }
+            
+
+
+        }
+
+    })
+</script>
+{% endblock js %}

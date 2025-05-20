@@ -1,0 +1,540 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+Regulaciones | LeyTracker
+{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'vendor/libs/sweetalert2/sweetalert2.css' %}" />
+<style>
+    td {
+        font-size: 1em;
+    }
+
+    .linea {
+        padding-right: 0.1em;
+        margin-top: 0.35em;
+    }
+
+    .loading-screen {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        color: white;
+        font-size: 24px;
+    }
+
+
+    .card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .card-title {
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .card .small {
+        flex-shrink: 0;
+    }
+
+    .linea {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        /* Alinear elementos verticalmente en el centro */
+        margin-bottom: 5px;
+        /* Espacio entre líneas */
+    }
+
+    .linea>span {
+        margin-right: 10px;
+        /* Espacio entre los spans */
+    }
+
+    button {
+        flex-shrink: 0;
+        background-color: #007bff;
+        /* Asegurar que los botones se ajusten al tema */
+        border: none;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+        /* Asegurar que los botones cambien al pasar el cursor */
+    }
+
+    .badge {
+        font-size: 14px;
+        /* Ajustar tamaño de la fuente de las insignias */
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+
+<div id="app">
+    <div class="page-breadcrumb breadcrumb-font  d-md-flex align-items-center mb-3">
+        <h3 class="content-header-title float-left mb-0" style="margin-right: 15px;">Lista Regulaciones</h3>
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    <li class="breadcrumb-item"><a href="javascript:;"><i class="tf-icons ti ti-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item active mt-1" aria-current="page">Regulaciones</li>
+
+                    <li class="breadcrumb-item active mt-1" aria-current="page">Lista</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <div class="loading-screen" id="loadingScreen">
+        <div>Cargando...</div>
+    </div>
+    <div id="vista-principal" class="row d-none">
+        <div class="col-12 order-1 order-lg-2 mb-4 mb-lg-0">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="row d-flex align-items-center">
+                        <div class="col-12 col-lg-9 d-flex align-items-center">
+                            <h3>Listado de Regulaciones</h3>
+                        </div>
+                        <!--<div class="col-2 btn-end">
+                            <button data-bs-toggle="offcanvas" data-bs-target="#offcanvasBackdrop" aria-controls="offcanvasBackdrop"
+                                class="btn btn-primary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#pricingModal">
+                                Agregar Usuario
+                            </button>
+                            </div>-->
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-12 col-lg-10">
+                                    <div class="row">
+                                        <div class="col-12 col-lg-6 mt-3">
+                                            <label for="inputNombe" class="control-label">Politica Publica :</label>
+                                            <input id="inputNombe" class="form-control" v-model="filtros.nombre">
+                                        </div>
+                                        <div class="col-6 col-lg-3 mt-3">
+                                            <label  for="dropdownImpacto" class="control-label">Impacto :</label>
+                                            <select class="form-select" id="dropdownImpacto"
+                                                v-model="filtros.impacto">
+                                                <option value="-1">Todos</option>
+                                                <option value="0">IMPLEMENTACION</option>
+                                                <option value="1">BAJO</option>
+                                                <option value="2">MEDIO</option>
+                                                <option value="3">ALTO</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6 col-lg-3 mt-3">
+                                            <label  for="dropdownFactibilidad" class="control-label">Factibilidad :</label>
+                                            <select class="form-select" id="dropdownFactibilidad"
+                                                v-model="filtros.factibilidad">
+                                                <option value="-1">Todos</option>
+                                                <option value="0">IMPLEMENTACION</option>
+                                                <option value="1">BAJO</option>
+                                                <option value="2">MEDIO</option>
+                                                <option value="3">ALTO</option>
+                                            </select>
+                                        </div>
+                                        
+                                        
+
+                                    </div>
+                                    <div class="row" v-if="masFiltros">
+                                        <div class="col-12 col-lg-6 mt-3">
+                                            <label for="inputTramite" class="control-label">Estado Tramite :</label>
+                                            <input id="inputTramite" class="form-control" v-model="filtros.estado_tramite">
+                                        </div>
+                                        <div class="col-6 col-lg-3 mt-3">
+                                            <label for="dropdownServicio" class="control-label">Servicio :</label>
+                                            <select class="form-select" id="dropdownServicio"
+                                                v-model="filtros.servicio">
+                                                <option value="-1">Todos</option>
+                                                <option value="0">S</option>
+                                                <option value="1">M</option>
+                                                <option value="2">L</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6 col-lg-3 mt-3">
+                                            <label for="dropdownPrio" class="control-label">Priorización :</label>
+                                            <select class="form-select" id="dropdownPrio"
+                                                v-model="filtros.priorizacion">
+                                                <option value="-1">Todos</option>
+                                                <option value="0">POR DEFINIR</option>
+                                                <option value="1">INCIDENCIA</option>
+                                                <option value="2">INFORMAR</option>
+                                            </select>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="row" v-if="masFiltros">
+                                        <div class="col-6 col-lg-3 mt-3">
+                                            <label for="dropdownImpcPub" class="control-label">Impacto Publico :</label>
+                                            <select class="form-select" id="dropdownImpcPub" v-model="filtros.impacto_publico">
+                                                <option value="-1">Todos</option>
+                                                <option value="0">POR DEFINIR</option>
+                                                <option value="1">INCIDENCIA</option>
+                                                <option value="2">INFORMAR</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-6 col-lg-3 mt-3">
+                                            <label for="dropdownESG" class="control-label">ESG :</label>
+                                            <select class="form-select" id="dropdownESG"
+                                                v-model="filtros.esg">
+                                                <option value="-1">Todos</option>
+                                                <option value="0">IMPLEMENTACION</option>
+                                                <option value="1">E</option>
+                                                <option value="2">S</option>
+                                                <option value="3">G</option>
+                                                <option value="4">N/A</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6 col-lg-3 mt-3">
+                                            <label for="dropdownEstado" class="control-label">Estado :</label>
+                                            <select class="form-select" id="dropdownEstado"
+                                                v-model="filtros.estado">
+                                                <option value="-1">TODOS</option>
+                                                <option value="0">INACTIVO</option>
+                                                <option value="1">ACTIVO</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-12 col-lg-2 d-flex flex-column justify-content-start align-items-center mt-3">
+                                    <button class="btn btn-primary w-100 mb-2" @click="fetchData">
+                                        <i class="tf-icons ti ti-search"></i>
+                                        Buscar
+                                    </button>
+                                    <button class="btn btn-secondary w-100 mb-2" @click="limpiarFiltros">
+                                        <i class="tf-icons ti ti-clear-all"></i>
+                                        Limpiar
+                                    </button>
+                                    <button :class="{'btn': true, 'w-100': true, 'btn-info': !masFiltros,'btn-danger': masFiltros}" @click="toggleFiltros">
+                                        <i class="tf-icons ti ti-plus"></i>
+                                        [[masFiltros? 'Menos':'Mas']] Filtros
+                                    </button>
+                                </div>
+
+
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <template v-for="regulacion in show_regulaciones">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h4 class="card-title">
+                                            <span class="badge bg-info me-1" style="font-size: 14px;"
+                                                v-text="'# '+regulacion.correlativo"></span>
+                                            - [[ regulacion.nombre ]]
+                                        </h4>
+                                        <small class="text-muted float-end">[[ regulacion.estado_tramite ]]</small>
+                                        <div class="row pt-3 mt-3">
+                                            <div class="col-sm-4 linea">
+                                                <span class="badge bg-light-dark me-1">IMPACTO</span>
+                                                <span class="badge me-1"
+                                                    :class="regulacion.impacto == '-1' ? 'bg-light-danger' : estilos[regulacion.impacto]">
+                                                    [[ regulacion.impacto_texto ]]
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-4 linea">
+                                                <span class="badge bg-light-dark me-1">FACTIBILIDAD</span>
+                                                <span class="badge me-1"
+                                                    :class="regulacion.factibilidad == '-1' ? 'bg-light-danger' : estilos[regulacion.factibilidad]">
+                                                    [[ regulacion.factibilidad_texto ]]
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-4 linea">
+                                                <span class="badge bg-light-dark me-1">SERVICIO</span>
+                                                <span class="badge me-1"
+                                                    :class="regulacion.servicio == '-1' ? 'bg-light-danger' : estilos_service[regulacion.servicio]">
+                                                    [[ regulacion.servicio_texto ]]
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-4 linea">
+                                                <span class="badge bg-light-dark me-1">PRIORIZACIÓN</span>
+                                                <span class="badge me-1"
+                                                    :class="regulacion.priorizacion == '-1' ? 'bg-light-danger' : estilos_prio[regulacion.priorizacion]">
+                                                    [[ regulacion.priorizacion_texto ]]
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-4 linea">
+                                                <span class="badge bg-light-dark me-1">IMPACTO PÚBLICO</span>
+                                                <span class="badge me-1"
+                                                    :class="regulacion.impacto_publico == '-1' ? 'bg-light-danger' : estilos[regulacion.impacto_publico]">
+                                                    [[ regulacion.impacto_publico_texto ]]
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-4 linea">
+                                                <span class="badge bg-light-dark me-1">ESG</span>
+                                                <span class="badge me-1"
+                                                    :class="regulacion.esg == '-1' ? 'bg-light-danger' : estilos[regulacion.esg]">
+                                                    [[ regulacion.esg_texto ]]
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-4 linea">
+                                                <span class="badge bg-light-dark me-1">ESTADO</span>
+                                                <span class="badge me-1"
+                                                    :class="regulacion.activo ? 'bg-light-success' : 'bg-light-danger'">
+                                                    [[ regulacion.activo ? 'ACTIVO' : 'INACTIVO' ]]
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-4 linea">
+                                                <span class="badge bg-light-dark me-1">CANTIDAD COMENTARIOS</span>
+                                                <span class="badge me-1 bg-light-primary">
+                                                    [[ regulacion.comentarios ]]
+                                                </span>
+                                            </div>
+                                            <div class="col-sm-4 linea">
+                                                <span class="badge bg-light-dark me-1">ULTIMA EDICION</span>
+                                                <span class="badge bg-light-primary me-1 "
+                                                    v-text="regulacion.fecha_edicion"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3 d-flex align-items-end justify-content-end">
+                                            {% if request.user.profile.tipo_usuario in "0,1,2" %}
+                                            <div class="col-12 col-lg-3">
+                                                <button class="btn btn-primary w-100 mt-2"
+                                                    @click="editar(regulacion.id)">
+                                                    <i class="tf-icons ti ti-edit"></i>
+                                                    &nbsp;Editar
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                            <div class="col-12 col-lg-3">
+                                                <button class="btn btn-primary w-100 mt-2" @click="ver(regulacion.id)">
+                                                    <i class="tf-icons ti ti-eye"></i>
+                                                    &nbsp;Ver
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <div class="mt-5 mb-3" style=" text-align: center;">
+                                <button class="btn btn-md btn-outline-primary mr-2" :disabled="current_page == 1"
+                                    @click="goToPage(1);"><i class="ti ti-chevrons-left"
+                                        style="margin-left: 0px; font-size:1rem;"></i></button>
+                                <button class="btn btn-md btn-outline-primary mr-2" :disabled="current_page == 1"
+                                    @click="addpage(-1);"><i class="ti ti-chevron-left"
+                                        style="margin-left: 0px; font-size:1rem;"></i></button>
+                                <template v-if="totalPages <= 5">
+                                    <!-- Si hay 10 páginas o menos, mostrar todas las páginas -->
+                                    <button v-for="pageNumber in totalPages" :key="pageNumber"
+                                        class="btn btn-md btn-outline-primary mr-2"
+                                        :class="{ active: current_page === pageNumber }" @click="goToPage(pageNumber)">
+                                        [[ pageNumber ]]
+                                    </button>
+                                </template>
+                                <template v-else>
+                                    <!-- Si hay más de 10 páginas, mostrar solo 10 páginas alrededor de la página actual -->
+                                    <button v-for="pageNumber in visiblePages" :key="pageNumber"
+                                        class="btn btn-md btn-outline-primary mr-2"
+                                        :class="{ active: current_page === pageNumber }" @click="goToPage(pageNumber)">
+                                        [[ pageNumber ]]
+                                    </button>
+                                </template>
+                                <button class="btn btn-md btn-outline-primary mr-2"
+                                    :disabled="current_page == totalPages" @click="addpage(1);"><i
+                                        class="ti ti-chevron-right"
+                                        style="margin-left: 0px; font-size:1rem;"></i></button>
+                                <button class="btn btn-md btn-outline-primary mr-2"
+                                    :disabled="current_page == totalPages" @click="goToPage(totalPages);"><i
+                                        class="ti ti-chevrons-right"
+                                        style="margin-left: 0px; font-size:1rem;"></i></button>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBackdrop" aria-labelledby="offcanvasBackdropLabel">
+        <div class="offcanvas-header">
+            <h4 id="offcanvasBackdropLabel" class="offcanvas-title" style="padding-left: 4.5em;">Nuevo Usuario</h4>
+            <button id="close_modal" type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body mx-0 pt-0 flex-grow-0">
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="mb-0">Datos Personales</h5> <small class="text-muted float-end"></small>
+                </div>
+                <div class="col-12 mt-3">
+                    <label class="control-label">Nombres:</label>
+                    <input type="text" class="form-control">
+                </div>
+
+                <div class="col-12 mt-3">
+                    <label class="control-label">Tipo Usuario:</label>
+                    <select class="form-select" id="dropdownContrato">
+                        <option value="-1" selected disabled>Seleccione</option>
+                    </select>
+                </div>
+                <div class="col-12 mt-5">
+                    <button class="btn btn-primary w-100">Crear Usuario</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+        $("#lista-regulacion-sidebar").addClass("active")
+    })
+</script>
+
+
+<script>
+    new Vue({
+        el: "#app",
+        delimiters: ['[[', ']]'],
+        data: {
+            estilos: ["bg-light-warning", "bg-light-success", "bg-light-warning", "bg-light-danger", "bg-light-warning"],
+            estilos_service: ["bg-light-success", "bg-light-warning", "bg-light-danger"],
+            estilos_prio: ["bg-light-warning", "bg-light-danger", "bg-light-warning"],
+            filtros: {
+                nombre: "",
+                estado_tramite:"",
+                impacto:"-1",
+                factibilidad:"-1",
+                servicio:"-1",
+                priorizacion:"-1",
+                impacto_publico:"-1",
+                esg: "-1",
+                estado: "1",
+                pagina: 1,
+                pageSize: 5,
+            },
+            masFiltros:false,
+            show_regulaciones: [],
+            totalPages: 1,
+            current_page: 1,
+
+        },
+        mounted() {
+            this.fetchData()
+        },
+        computed: {
+            visiblePages() {
+                const totalPages = this.totalPages;
+                const current_page = this.current_page;
+
+                // Calcula los límites de las páginas visibles
+                let start = Math.max(1, current_page - 2);
+                let end = Math.min(totalPages, current_page + 2);
+
+                // Ajusta el rango si está cerca del principio o del final
+                if (current_page - 2 < 1) {
+                    end = Math.min(totalPages, end + (2 - (current_page - start)));
+                }
+                if (current_page + 2 > totalPages) {
+                    start = Math.max(1, start - ((current_page + 2) - totalPages));
+                }
+
+                // Crea un array con las páginas visibles
+                return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+            }
+        },
+        created() {
+        },
+        methods: {
+            limpiarFiltros(){
+                this.filtros.nombre = "";
+                this.filtros.impacto ="-1";
+                this.filtros.factibilidad ="-1";
+                this.filtros.servicio ="-1";
+                this.filtros.estado_tramite ="";
+                this.filtros.priorizacion ="-1";
+                this.filtros.impacto_publico ="-1";
+                this.filtros.esg = "-1";
+                this.filtros.estado = "1";
+                this.filtros.pagina = 1;
+                this.fetchData()
+            },
+            removeLoading() {
+                const elemento = document.getElementById('vista-principal');
+                elemento.classList.remove('d-none');
+                document.getElementById('loadingScreen').style.display = 'none';
+            },
+            goToPage(pageNumber) {
+                this.filtros.pagina = pageNumber;
+                this.fetchData()
+            },
+            addpage(value) {
+                this.filtros.pagina += value
+                this.fetchData()
+            },
+            fetchData() {
+                axios.post("/api/get/regulaciones/?page=" + this.filtros.pagina + "&page_size=" + this.filtros.pageSize, this.filtros).then((response) => {
+                    this.show_regulaciones = response.data.regulaciones
+                    console.log(this.show_regulaciones)
+                    this.totalPages = response.data.totalPages
+                    this.current_page = response.data.currentPage
+                    this.removeLoading();
+                })
+            },
+            editar(id) {
+                window.location.href = "/editar/regulacion/" + id + "/"
+            },
+            ver(id) {
+                window.location.href = "/ver/regulacion/" + id + "/"
+            },
+            toggleFiltros() {
+                this.masFiltros = !this.masFiltros; 
+            }
+
+        }
+
+    })
+</script>
+{% endblock js %}
