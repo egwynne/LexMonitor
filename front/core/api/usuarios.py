@@ -11,6 +11,7 @@ import requests
 from django.db.models import Q, F
 from django.core.paginator import Paginator
 from rest_framework import status
+from django.contrib.auth import update_session_auth_hash
 
 class GetUsers(APIView):
     authentication_classes = []
@@ -85,7 +86,6 @@ class EditUser(APIView):
     def post(self, request, format=None, source=None):
         response = {}
         data = request.data.get('editar_user')
-        print(data)
         profile = Profile.objects.get(id=data.get("id"))
         profile.user.first_name = data.get("nombre")
         profile.user.last_name = data.get("apellido")
@@ -114,3 +114,38 @@ class CambiarStatusUsers(APIView):
             "HTTP_200_OK": "¡Datos Ingresados Correctamente!"
         }
         return Response(response)
+    
+class GetAccountsProfile(APIView):
+    def get(self, request, *args, **kwargs):
+        # Obtiene el ID de la cuenta desde los parámetros de la consulta
+        response = {
+            'active_profile' : request.user.get_active_profile().account.id,
+            'accounts' : [{
+                'id' : profile.account.id,
+                'name' : profile.account.name
+            } for profile in request.user.profiles.all()]
+        }
+        
+        return Response(response, status=status.HTTP_200_OK)
+
+
+
+class ChangePassword(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        user = request.user
+        nueva_pass = request.data.get("nueva_pass")
+
+        if not nueva_pass:
+            return Response({"error": "La nueva contraseña es requerida."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(nueva_pass) < 8:
+            return Response({"error": "La contraseña debe tener al menos 8 caracteres."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(nueva_pass)
+        user.save()
+        update_session_auth_hash(request, user)  
+
+        return Response({"message": "¡Contraseña cambiada correctamente!"}, status=status.HTTP_200_OK)
+    

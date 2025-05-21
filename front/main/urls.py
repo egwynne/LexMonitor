@@ -23,6 +23,8 @@ urlpatterns = [
     path("api/create/usuario/", core_apis.CreateUser.as_view(), name="api/create/usuario/"),
     path("api/edit/usuario/", core_apis.EditUser.as_view(), name="api/edit/usuario/"),
     path("api/change/status/user/", core_apis.CambiarStatusUsers.as_view(), name="api/change/status/user/"),
+    path("api/change/password/", core_apis.ChangePassword.as_view(), name="api/change/password/"),
+    path('api/core/accounts_profile/',  core_apis.GetAccountsProfile.as_view(), name='accounts_profile'),
 
     path("api/get/correlativo/", core_apis.GetCorrelativo.as_view(), name="api/get/correlativo/"),
     path("api/get/regulaciones/", core_apis.GetRegulaciones.as_view(), name="api/get/regulaciones/"),

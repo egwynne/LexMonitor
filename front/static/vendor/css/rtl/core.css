@@ -23398,3 +23398,49 @@ a.bg-vimeo:hover, a.bg-vimeo:focus {
     transform: rotate(360deg);
   }
 }
+
+
+.bg-light-primary {
+  background: #7367f0;
+  color: #fff;
+}
+
+.bg-light-success {
+  background: #eaf6f2;
+  color: #2ca87f;
+}
+
+.badge.bg-light-info {
+  background: #ecfafb;
+  color: #3ec9d6;
+}
+
+.badge.bg-light-warning {
+  background: #fcf3e6;
+  color: #e58a00;
+}
+
+.badge.bg-light-danger {
+  background: #fce9e9;
+  color: #dc2626;
+}
+
+.badge.bg-light-light {
+  background: #fefeff;
+  color: #f8f9fa;
+}
+
+.badge.bg-light-dark {
+  background: #e9e9ea;
+  color: #212529;
+}
+
+.border-start-custom{
+  border-left: 1px solid #39a5ea !important;
+}
+
+@media (max-width: 600px) {
+.border-start-custom {
+  border-left: none !important;
+}
+}

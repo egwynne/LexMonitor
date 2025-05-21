@@ -27,7 +27,7 @@ def login_view(request):
             else:
                 request.session.set_expiry(0)
             login_f(request, user)
-            url = reverse("index") + "?param="+ "1" if user.profile.cambiar_pass else "0"
+            url = reverse("index")
             return HttpResponseRedirect(url)
             #elif request.user.profile.tipo_usuario == "1":
             #    return redirect("index_ejecutivo")
@@ -48,9 +48,9 @@ def register_view(request, id=None):
 def index(request):
     template_name = "index.html"
     context = {}
-    param = request.GET.get("param", "")
+    param = request.user.get_active_profile().cambiar_pass
     context['cambiar_pass'] = False
-    if param == '1':
+    if param:
         context['cambiar_pass'] = True
     print(context)
     return render(request, template_name, context)

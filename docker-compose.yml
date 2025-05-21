@@ -33,6 +33,7 @@ services:
     networks:
       - django-gestion-banco-dev
 
+
 networks:
   django-gestion-banco-dev:
     driver: bridge

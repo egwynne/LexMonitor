@@ -86,6 +86,8 @@ class GetRegulaciones(APIView):
             query &= Q(impacto_publico=data.get("impacto_publico"))
         if data.get("esg") != "-1":
             query &= Q(esg=data.get("esg"))
+        if data.get("foco"):
+            query &= Q(foco=data.get("foco"))
         if data.get("estado") != "-1":
             query &= Q(activo=data.get("estado"))
         regulaciones = Regulacion.objects.filter(query).order_by('correlativo')
@@ -111,6 +113,7 @@ class GetRegulaciones(APIView):
             "esg_texto" : ESCALA_ESG[int(regulacion.esg)][1],
             "comentarios": len(regulacion.comentarios.all()),
             "activo":regulacion.activo,
+            "foco":regulacion.foco,
             "fecha":regulacion.fecha_creacion.strftime('%d-%m-%Y'),
             "fecha_edicion":regulacion.fecha_edicion.strftime('%d-%m-%Y'),
         } for regulacion in page]

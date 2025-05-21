@@ -42,12 +42,55 @@ ESCALA_ESG = (
     ("-1", "SIN ASIGNAR"),
 )
 
+
+class Account(models.Model):
+    name = models.CharField(max_length=255)
+    url_empresa = models.CharField(max_length=255, blank=True,null=True)
+    code = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(default=True)
+    logo = models.ImageField(upload_to="media/", blank=True, null=True , default='media/account_avatar.png')
+    background = models.ImageField(upload_to="media/", blank=True, null=True, default='media/bg-app.jpg')
+    color = models.CharField(max_length=255, null=True, blank=True)
+    flow_sync = models.DateTimeField(auto_now_add=True)
+
+#class ProfileType(models.Model):
+#    name = models.CharField(max_length=100)
+#    description = models.TextField(null=True, blank=True)
+#    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="profile_types")
+
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profiles")
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="profiles")
+    #profile_type = models.ForeignKey(ProfileType, on_delete=models.CASCADE, related_name="profiles")
     tipo_usuario = models.CharField(choices=USER_TYPES, max_length=1, default="0")
-    telefono = models.CharField(max_length=10, null=True, blank=True)
+    rut = models.CharField(max_length=50, blank=True, null=True)
+    telefono = models.CharField(max_length=50, blank=True, null=True)
+    is_active = models.BooleanField(default=False)  # Indica si es el perfil activo
     status = models.BooleanField(default=True, blank=True, null=True)
     cambiar_pass = models.BooleanField(default=True, blank=True, null=True)
+
+    def has_permission(self, url):
+        #if self.profile_type.profiletype_permissions.filter(permission__code='admin').exists():
+        #    return True
+        #return self.profile_type.profiletype_permissions.filter(permission__url=url).exists()
+        return True
+    
+    @staticmethod
+    def set_active_profile(user, account_id):
+        """
+        Cambia el perfil activo para el usuario.
+        """
+        user.profiles.update(is_active=False)  # Desactivar todos los perfiles
+        Profile.objects.filter(account__id=account_id, user=user).update(is_active=True)
+        
+    def get_active(self):
+        return self.user.get_active_profile(self.user)
+
+def get_active_profile(self):
+    return self.profiles.filter(is_active=True).first()
+
+User.add_to_class("get_active_profile", get_active_profile)
 
 class Comentario(models.Model):
     fecha_creacion = models.DateField(default=timezone.now, null=True, blank=True)

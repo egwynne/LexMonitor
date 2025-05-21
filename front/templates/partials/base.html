@@ -10,6 +10,7 @@
   <meta charset="utf-8" />
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+  <meta name="csrf-token" content="{{ csrf_token }}">
 
   <title>{% block title %}{% endblock title %}</title>
 
@@ -33,8 +34,8 @@
   <link rel="stylesheet" href="{% static 'vendor/fonts/flag-icons.css' %}" />
 
   <!-- Core CSS -->
-  <link rel="stylesheet" href="{% static 'vendor/css/rtl/core-dark.css' %}" class="template-customizer-core-css" />
-  <link rel="stylesheet" href="{% static 'vendor/css/rtl/theme-default-dark.css' %}"
+  <link rel="stylesheet" href="{% static 'vendor/css/rtl/core.css' %}" class="template-customizer-core-css" />
+  <link rel="stylesheet" href="{% static 'vendor/css/rtl/theme-default.css' %}"
     class="template-customizer-theme-css" />
   <link rel="stylesheet" href="{% static 'css/demo.css' %}" />
 
@@ -50,6 +51,7 @@
   <link rel="stylesheet" href="{% static 'vendor/libs/flatpickr/flatpickr.css' %}" />
 
   <link rel="stylesheet" href="{% static 'vendor/libs/select2/select2.css' %}" />
+  <link rel="stylesheet" href="{% static 'vendor/libs/toastr/toastr.css' %}" />
 
 
 
@@ -151,6 +153,22 @@
             <ul class="navbar-nav flex-row align-items-center ms-auto">
 
               <!-- User -->
+              {% if request.user.profiles.exists %}
+               
+              <li class="nav-item  me-3 me-xl-2">
+                <label>
+                  <select
+                    v-model="active_profile"
+                    @change="changeActiveProfile"
+                    class="form-select"
+                  >
+                    <option v-for="account in accounts_profile" :value="account.id" v-text="account.name"></option>
+                  </select>
+                </label>
+              </li>
+
+              {% endif %}
+
               <li class="nav-item navbar-dropdown dropdown-user dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                   <div class="d-flex align-items-center">
@@ -175,7 +193,7 @@
                         <div class="flex-grow-1">
                           <span class="fw-semibold d-block">{{request.user.first_name}}
                             {{request.user.last_name}}</span>
-                          <small class="text-muted">{{request.user.profile.tipo_usuario | usuario}}</small>
+                          <small class="text-muted"></small>
                         </div>
                       </div>
                     </a>
@@ -183,7 +201,7 @@
                   <li>
                     <div class="dropdown-divider"></div>
                   </li>
-                  {% if request.user.profile.tipo_usuario == "Cliente" %}
+                  {% if request.user.get_active_profile.tipo_usuario == "Cliente" %}
                   <li>
                     <a class="dropdown-item" href="{% url 'perfil_cliente' %}">
                       <i class="ti ti-user-check me-2 ti-sm"></i>
@@ -353,8 +371,24 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue-select2@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="{% static 'vendor/libs/toastr/toastr.js' %}"></script>
 
   <script src="{% static 'js/pages-auth.js' %}"></script>
+
+  <script>
+    // Configuración global
+    toastr.options = {
+      "positionClass": "toast-bottom-right", // Posición predeterminada
+      "closeButton": true,                  // Habilitar botón de cierre
+      "progressBar": true,                  // Mostrar barra de progreso
+      "timeOut": "5000",                    // Duración predeterminada (5 segundos)
+      "extendedTimeOut": "1000",            // Tiempo extra al pasar el mouse
+      "hideDuration": "3000",               // Duración de animación al ocultarse
+      "showDuration": "300",                // Duración de animación al mostrarse
+      "showMethod": "fadeIn",               // Método para mostrar
+      "hideMethod": "fadeOut"               // Método para ocultar
+    };
+  </script>
 
   <script>
 
@@ -362,27 +396,34 @@
       el: "#modals-vue",
       delimiters: ['[[', ']]'],
       data: {
-        status_sync: "",
-        update_at: "",
-        cambiar_pass: "{{cambiar_pass}}",
         nueva_pass: {
-          id_usuario: "",
           nueva_pass: "",
           repetir_pass: "",
         }
       },
       mounted() {
-        if (this.cambiar_pass) {
-          document.getElementById('cambiar_pass_button').click()
-        }
-      },
-      created() {
+        this.setCSRFToken();
 
       },
+      created() {
+      },
       methods: {
+        setCSRFToken() {
+          const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+          axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
+        },
         cambiarPass(){
           if(this.nueva_pass.nueva_pass == this.nueva_pass.repetir_pass){
-            console.log("holi")
+            axios.post("/api/change/password/", this.nueva_pass).then((response) => {
+              const modalEl = document.getElementById('pagarIVA');
+              const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+              modalInstance.hide();
+              toastr.success("Contraseña cambiada con exito.");
+            }).catch(error => {
+              console.log(error)
+              toastr.error(error.response.data.error);
+
+            })
           }
         }
       }
@@ -393,19 +434,52 @@
       data: {
         status_sync: "",
         update_at: "",
-        cambiar_pass: "{{cambiar_pass}}",
+        cambiar_pass: JSON.parse('{{ cambiar_pass|yesno:"true,false"|lower }}'),
+        active_profile : null,
+        accounts_profile: null,
         
       },
       mounted() {
         if (this.cambiar_pass) {
           document.getElementById('cambiar_pass_button').click()
         }
+        this.setCSRFToken();
+        this.getActiveAccount();
+
       },
       created() {
 
       },
       methods: {
-        
+        setCSRFToken() {
+          const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+          axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
+        },
+        changeActiveProfile() {
+          const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+          axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
+          axios
+            .post("/api/core/set_active_profile/",{
+              account_id: this.active_profile
+            })
+            .then((response) => {
+              window.location.reload()
+            })
+            .catch((error) => {
+              console.error("Error fetching orders:", error);
+            });
+        },
+        getActiveAccount() {
+          axios
+            .get("/api/core/accounts_profile/")
+            .then((response) => {
+              this.active_profile = response.data.active_profile
+              this.accounts_profile = response.data.accounts
+            })
+            .catch((error) => {
+              console.error("Error fetching orders:", error);
+            });
+        },
       }
     })
   </script>
