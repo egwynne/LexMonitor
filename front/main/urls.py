@@ -2,6 +2,9 @@ from django.contrib import admin
 from django.urls import path
 import core.views as core_views
 import core.api as core_apis
+from django.conf import settings
+from django.conf.urls.static import static
+import os
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,3 +39,7 @@ urlpatterns = [
     path("api/agregar/comentario/", core_apis.AgregarComentario.as_view(), name="api/agregar/comentario/"),
 
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=os.path.join(settings.BASE_DIR, 'static'))
