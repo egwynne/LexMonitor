@@ -30,4 +30,4 @@ ADD ./ /code/
 ARG DJANGO_APP
 ENV DJANGO_APP=${DJANGO_APP}
 EXPOSE 8090
-CMD ["gunicorn", "--bind", "0.0.0.0:8090", "${DJANGO_APP}.wsgi:application"]
+CMD sh -c "gunicorn --bind 0.0.0.0:8090 ${DJANGO_APP}.wsgi:application"
