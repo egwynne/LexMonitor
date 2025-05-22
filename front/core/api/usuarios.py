@@ -144,8 +144,11 @@ class ChangePassword(APIView):
             return Response({"error": "La contraseña debe tener al menos 8 caracteres."}, status=status.HTTP_400_BAD_REQUEST)
 
         profile = user.get_active_profile()
+
+        
         profile.cambiar_pass = False
         profile.save()
+        
         user.set_password(nueva_pass)
         user.save()
         update_session_auth_hash(request, user)  
